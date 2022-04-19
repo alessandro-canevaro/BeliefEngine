@@ -1,4 +1,5 @@
-from sympy.logic.boolalg import to_cnf, And, Or, Equivalent
+from sympy import *
+from sympy.logic.boolalg import to_cnf, And, Or, Equivalent, Not
     
 class BeliefBase:
     ''' initially belief base is empty '''
@@ -36,3 +37,56 @@ class Belief:
         self.formula = formula
         self.newcnf = to_cnf(formula)
 """
+
+#perhaps this part should go in a separate file
+
+def PL_Resolution(KB, alpha):
+    """Algorithm to check if alpha is entailed in KB.
+       return true or false
+    """
+    pass
+
+def PL_Resolve(Ci, Cj):
+    """Returns the set of all possible clauses obtained by resolving its two inputs.
+    """
+
+    clauses = []
+    Ci_d, Cj_d = disjuncts([Ci]), disjuncts([Cj])
+
+    for i in Ci_d:
+        for j in Cj_d:
+            # If di, dj are complementary
+            if i == ~j or ~i == j:
+                # Create list of all disjuncts except di and dj
+                res = [k for k in Ci_d if k != i] + [k for k in Cj_d if k != j]
+                # Remove duplicates
+                res = list(set(res))
+                # Join into new clause
+                res = disjuncts(res)
+                if len(res) == 0:
+                    clauses.append(Or.identity)
+                elif len(res) == 1:
+                    clauses.append(res[0])
+                else:
+                    clauses.append(Or(*res))
+
+    return clauses
+
+def disjuncts(clause):
+    result = []
+
+    def collect(subargs):
+        for arg in subargs:
+            if isinstance(arg, Or):
+                collect(arg.args)
+            else:
+                result.append(arg)
+
+    collect(clause)
+    return result
+
+
+if __name__ == "__main__":
+    x, y = symbols('x,y')
+    print(PL_Resolve(x | (y | x >> y), Not(x >> y)))
+    print(PL_Resolve(x | y, Not(x) | Not(y)))
