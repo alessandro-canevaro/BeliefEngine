@@ -1,5 +1,7 @@
 from sympy import *
 from sympy.logic.boolalg import to_cnf, And, Or, Equivalent, Not
+import itertools
+
     
 class BeliefBase:
     ''' initially belief base is empty '''
@@ -44,14 +46,36 @@ def PL_Resolution(KB, alpha):
     """Algorithm to check if alpha is entailed in KB.
        return true or false
     """
-    pass
+
+    # Split base into conjuncts
+    clauses = split(KB+[to_cnf(~alpha)], And)
+
+    # Special case if one clause is already False
+    if False in clauses:
+        return True
+
+    new = set()
+    while True:
+        for Ci, Cj in itertools.combinations(clauses, 2):
+            resolvents = PL_Resolve(Ci, Cj)
+            if False in resolvents:
+                return True
+            new = new.union(set(resolvents))
+
+        if new.issubset(set(clauses)):
+            return False
+
+        #Add discovered clauses
+        for c in new:
+            if c not in clauses:
+                clauses.append(c)
 
 def PL_Resolve(Ci, Cj):
     """Returns the set of all possible clauses obtained by resolving its two inputs.
     """
 
     clauses = []
-    Ci_d, Cj_d = disjuncts([Ci]), disjuncts([Cj])
+    Ci_d, Cj_d = split([Ci], Or), split([Cj], Or)
 
     for i in Ci_d:
         for j in Cj_d:
@@ -62,7 +86,7 @@ def PL_Resolve(Ci, Cj):
                 # Remove duplicates
                 res = list(set(res))
                 # Join into new clause
-                res = disjuncts(res)
+                res = split(res, Or)
                 if len(res) == 0:
                     clauses.append(Or.identity)
                 elif len(res) == 1:
@@ -72,12 +96,12 @@ def PL_Resolve(Ci, Cj):
 
     return clauses
 
-def disjuncts(clause):
+def split(clause, op):
     result = []
 
     def collect(subargs):
         for arg in subargs:
-            if isinstance(arg, Or):
+            if isinstance(arg, op):
                 collect(arg.args)
             else:
                 result.append(arg)
@@ -90,3 +114,6 @@ if __name__ == "__main__":
     x, y = symbols('x,y')
     print(PL_Resolve(x | (y | x >> y), Not(x >> y)))
     print(PL_Resolve(x | y, Not(x) | Not(y)))
+    #print(False in x)
+    print(PL_Resolution([x|y], x))
+    print(PL_Resolution([x], x|y))
