@@ -1,6 +1,7 @@
 from sympy import *
 from sympy.logic.boolalg import to_cnf, And, Or, Equivalent, Not
 import itertools
+from math import isclose
 
     
 class BeliefBase:
@@ -14,12 +15,68 @@ class BeliefBase:
 
     def clear_belief_base(self):
         self.beliefBase = [] # may be it can be dict or a set?
+        
+    def arrangeBeliefs(self):
+
+            result = []
+            prev_order = None
+
+            for belief in self.beliefBase:
+                if prev_order is None:
+                    result.append(belief)
+                    prev_order = belief.order
+                    continue
+
+                if isclose(belief.order,
+                           prev_order):  
+                    result.append(belief)
+
+                else:
+                    yield prev_order, result
+                    result = [belief]
+                    prev_order = belief.order
+
+            yield prev_order, result
+
+
+    def degree(self, newBelief):
+
+            if PL_Resolution([], newBelief):
+
+            base = []
+            for order, r in self.arrangeBeliefs():  
+                base += [b.newBelief for b in r]
+                if PL_Resolution(base, newBelief):
+                    return order
+            return 0  # otherwise return 0
+
+    def revision(self, newBelief, order, add=True):
+            formula = to_cnf(newBelief) 
+            negFormula = Not(formula)
+            deg = self.degree(formula)
+
+            if 0 <= order <= 1:
+                if not PL_Resolution([], negFormula):
+                    # Is the new belief inconsistent
+                    if PL_Resolution([], formula):
+                        # Is it a tautology 
+                        order = 1
+                    elif order <= deg:
+                        self.contraction(formula, order)
+                    else:
+                        self.contraction(negFormula, 0)
+                        self.expansion(formula, order, False)
+
+                    if add:
+                        self.add(formula, order)
+            else:
+                order = False
     
-    def revision(self, newBelief):
+    '''def revision(self, newBelief):
         formula = to_cnf(newBelief)
         negFormula = Not(formula)
         self.contraction(negFormula)
-        self.expansion(newBelief)
+        self.expansion(newBelief)'''
 
     def expansion(self, belief):
         formula = to_cnf(belief)
