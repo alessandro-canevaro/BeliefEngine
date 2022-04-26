@@ -1,27 +1,94 @@
-from tkinter import EW
 from sympy import *
 from sympy.logic.boolalg import to_cnf, And, Or, Equivalent, Not
 import itertools
+from math import isclose
 
     
 class BeliefBase:
     ''' initially belief base is empty '''
     def __init__(self):
         self.beliefBase = []
-    '''
-    def add_to_belief_base(self, newBelief):
-        self.beliefBase.append(to_cnf(newBelief))
-    '''
+
+    # def add_to_belief_base(self, newBelief):
+    #     self.beliefBase.append(to_cnf(newBelief))
+
+    def expansion_belief(self, belief):
+        new_order = 1
+        if belief not in self.beliefBase:
+            new_atoms = belief.atoms()
+            for b in self.beliefs:
+                if new_atoms & b.formula.atoms():
+                    b.order = b.order - 0.1 * b.order
+        # belief with the same elements get their order updated to be lower (temporal effect)
+        # if the belief with the same elements has more operators it also gets a penalty
+        belief.append(new_order)
+        self.beliefBase.append(belief)
+
 
     def clear_belief_base(self):
         self.beliefBase = [] # may be it can be dict or a set?
-    
-    def revision(self, newBelief):
-        formula = to_cnf(newBelief)
-        negFormula = ~formula
-        self.contraction(negFormula)
-        self.expansion(newBelief)
         
+    def arrangeBeliefs(self):
+
+            result = []
+            prev_order = None
+
+            for belief in self.beliefBase:
+                if prev_order is None:
+                    result.append(belief)
+                    prev_order = belief.order
+                    continue
+
+                if isclose(belief.order,
+                           prev_order):  
+                    result.append(belief)
+
+                else:
+                    yield prev_order, result
+                    result = [belief]
+                    prev_order = belief.order
+
+            yield prev_order, result
+
+
+    def degree(self, newBelief):
+
+            if PL_Resolution([], newBelief):
+
+            base = []
+            for order, r in self.arrangeBeliefs():  
+                base += [b.newBelief for b in r]
+                if PL_Resolution(base, newBelief):
+                    return order
+            return 0  # otherwise return 0
+
+    def revision(self, newBelief, order, add=True):
+            formula = to_cnf(newBelief) 
+            negFormula = Not(formula)
+            deg = self.degree(formula)
+
+            if 0 <= order <= 1:
+                if not PL_Resolution([], negFormula):
+                    # Is the new belief inconsistent
+                    if PL_Resolution([], formula):
+                        # Is it a tautology 
+                        order = 1
+                    elif order <= deg:
+                        self.contraction(formula, order)
+                    else:
+                        self.contraction(negFormula, 0)
+                        self.expansion(formula, order, False)
+
+                    if add:
+                        self.add(formula, order)
+            else:
+                order = False
+    
+    '''def revision(self, newBelief):
+        formula = to_cnf(newBelief)
+        negFormula = Not(formula)
+        self.contraction(negFormula)
+        self.expansion(newBelief)'''
 
     def expansion(self, belief):
         formula = to_cnf(belief)
@@ -33,47 +100,6 @@ class BeliefBase:
         for b in self.beliefBase:
             if b == newBelief:
                 self.beliefBase.remove(newBelief)
-
-
-
-    def contract(self,newbelief):
-        if not self.belief_base:
-            return
-        con_new_belief = new_belief
-        new_belief_base = None
-        queue = [self.belief_base]
-        current_belief_base = ['I AM FILLED']
-
-        while 
-
-
-
-        cur_belief_base = self.belief_base
-
-        while new_belief_base is None and current_belief_base:
-            current_belief_base = queue.pop(0)
-            for b in current_belief_base:
-                if self.resolution(con_new_belief,current_belief_base):
-                    aux_belief_base = copy(current_belief_base)
-                    aux_belief_base = [bb for bb in aux_belief_base if bb.cnf_formula != b.cnf_formula]
-                    queue.append(aux_belief_base)
-                else:
-                    new_belief_base = current_belief_base
-                    break
-        if new_belief_base is not None:
-            self.belief_base = new_belief_base
-        else:
-            self.clear(False)
-            return
-
-
-
-
-
-
-
-
-
 
     def print_belief(self):
         pass
@@ -167,3 +193,6 @@ if __name__ == "__main__":
     #print(False in x)
     print(PL_Resolution([x|y], x))
     print(PL_Resolution([x], x|y))
+
+formula= [x|y,1]
+beliefbase=[[x|y,1],[x,0.2]]
