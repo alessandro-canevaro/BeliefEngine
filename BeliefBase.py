@@ -8,10 +8,22 @@ class BeliefBase:
     ''' initially belief base is empty '''
     def __init__(self):
         self.beliefBase = []
-    '''
-    def add_to_belief_base(self, newBelief):
-        self.beliefBase.append(to_cnf(newBelief))
-    '''
+
+    # def add_to_belief_base(self, newBelief):
+    #     self.beliefBase.append(to_cnf(newBelief))
+
+    def expansion_belief(self, belief):
+        new_order = 1
+        if belief not in self.beliefBase:
+            new_atoms = belief.atoms()
+            for b in self.beliefs:
+                if new_atoms & b.formula.atoms():
+                    b.order = b.order - 0.1 * b.order
+        # belief with the same elements get their order updated to be lower (temporal effect)
+        # if the belief with the same elements has more operators it also gets a penalty
+        belief.append(new_order)
+        self.beliefBase.append(belief)
+
 
     def clear_belief_base(self):
         self.beliefBase = [] # may be it can be dict or a set?
@@ -181,3 +193,6 @@ if __name__ == "__main__":
     #print(False in x)
     print(PL_Resolution([x|y], x))
     print(PL_Resolution([x], x|y))
+
+formula= [x|y,1]
+beliefbase=[[x|y,1],[x,0.2]]
