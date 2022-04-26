@@ -1,3 +1,4 @@
+from tkinter import EW
 from sympy import *
 from sympy.logic.boolalg import to_cnf, And, Or, Equivalent, Not
 import itertools
@@ -17,9 +18,10 @@ class BeliefBase:
     
     def revision(self, newBelief):
         formula = to_cnf(newBelief)
-        negFormula = Not(formula)
+        negFormula = ~formula
         self.contraction(negFormula)
         self.expansion(newBelief)
+        
 
     def expansion(self, belief):
         formula = to_cnf(belief)
@@ -31,6 +33,47 @@ class BeliefBase:
         for b in self.beliefBase:
             if b == newBelief:
                 self.beliefBase.remove(newBelief)
+
+
+
+    def contract(self,newbelief):
+        if not self.belief_base:
+            return
+        con_new_belief = new_belief
+        new_belief_base = None
+        queue = [self.belief_base]
+        current_belief_base = ['I AM FILLED']
+
+        while 
+
+
+
+        cur_belief_base = self.belief_base
+
+        while new_belief_base is None and current_belief_base:
+            current_belief_base = queue.pop(0)
+            for b in current_belief_base:
+                if self.resolution(con_new_belief,current_belief_base):
+                    aux_belief_base = copy(current_belief_base)
+                    aux_belief_base = [bb for bb in aux_belief_base if bb.cnf_formula != b.cnf_formula]
+                    queue.append(aux_belief_base)
+                else:
+                    new_belief_base = current_belief_base
+                    break
+        if new_belief_base is not None:
+            self.belief_base = new_belief_base
+        else:
+            self.clear(False)
+            return
+
+
+
+
+
+
+
+
+
 
     def print_belief(self):
         pass
