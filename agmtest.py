@@ -1,5 +1,7 @@
 
-def agmSuccess():
+
+
+def agmSuccess(result, input):
     pass
 def agmInclusion():
     pass
@@ -8,4 +10,5 @@ def agmVacuity():
 def agmConsistency():
     pass
 def agmExtensionality():
+    
     pass
