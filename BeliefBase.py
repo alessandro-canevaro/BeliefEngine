@@ -37,6 +37,13 @@ class BeliefBase:
 
     def clear_belief_base(self):
         self.beliefBase = [] # may be it can be dict or a set?
+
+
+    def getclauses(self):
+        return [belief.formula for belief in self.beliefs]
+
+    
+
     """       
     def arrangeBeliefs(self):
 
