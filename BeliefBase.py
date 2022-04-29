@@ -36,7 +36,7 @@ class BeliefBase:
         self.beliefs.append(belief)
 
     def clear_belief_base(self):
-        self.beliefBase = [] # may be it can be dict or a set?
+        self.beliefs = [] # may be it can be dict or a set?
 
 
     def getclauses(self):
@@ -114,11 +114,11 @@ class BeliefBase:
                 self.beliefBase.remove(newBelief)
 
     def print_belief(self):
-        for b in self.beliefs:
-            print(b.formula, b.value)
-
-    def show_current_belief_base(self):
-        print ("Current Belief Base: ", self.beliefBase)
+        if self.beliefs:
+            for b in self.beliefs:
+                print(b.formula, b.value)
+        else:
+            print("The belief base is empty")
     
     #Not sure we need this class. Maybe is helpful only when we do the part with plausible belief
     """      
