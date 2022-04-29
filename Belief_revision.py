@@ -41,12 +41,51 @@ def contract(BB, belief):
                     print(f">>> Added {t} to belief basis to satisfy (K-5)")
     self.beliefs = delta.beliefs
 
-def revision(BB, formula, newrank):
-    if 0 <= newrank:
-        contract(Not(formula))
-        BB.expand(formula, newrank)
-    else:
-        print(f"Rank {newrank} is negative.\nRevision not done.")
+def contraction(self, belief, value):
+remainders = self.getRemainders(belief)
+value = float(value)
+
+maxCertaintyGlobal = 0.0
+if self.values:
+    maxCertaintyGlobal = max(self.values.values())
+
+maxCertainty = -10 ** 10
+maxCertaintyCombined = 0.0
+bestRemainder = []
+# Find the remainder containing the highest certainty value
+# If there are more than one remainder containing the highest certainty value,
+# choose the one with the highest combined certainty
+for r in remainders:
+    tmpSum = sum(self.values[str(c)] for c in r)
+    for c in r:
+        tmpValue = self.values[str(c)]
+        if tmpValue > maxCertainty:
+            maxCertainty = tmpValue
+            maxCertaintyCombined = tmpSum
+            bestRemainder = r
+        elif tmpValue == maxCertainty:
+            if tmpSum > maxCertaintyCombined:
+                bestRemainder = r
+
+if maxCertainty < maxCertaintyGlobal and value < maxCertaintyGlobal:
+    # By doing the revision we would remove some belief that we are more certain of
+    # than the belief that we are trying to add, so we decide not to do it
+    return
+
+self.beliefs = bestRemainder
+
+def revision(BB, belief):
+    formula = to_cnf(belief)
+    negFormula = ~formula
+    if PL_Resolution([], negFormula):
+        print('\nInconsistent formulas cannot be added to the knowledge base')
+        return
+    if formula in BB.beliefs and belief.value != 0:
+        # Revising with a formula already in the knowledge base is updating the certainty value for that formula
+        BB.beliefs.values[str(formula)] = float(belief.value)
+        return
+    contraction(negFormula, belief.value)
+    BB.add(self.beliefs, formula, float(belief.value))
 
 if __name__ == '__main__':
     KB = BeliefBase()
