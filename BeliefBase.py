@@ -99,8 +99,8 @@ class BeliefBase:
                         self.add(formula, order)
             else:
                 order = False 
-
-    '''def revision(self, newBelief):
+'
+    def revision(self, newBelief):
         formula = to_cnf(newBelief)
         negFormula = Not(formula)
         self.contraction(negFormula)
