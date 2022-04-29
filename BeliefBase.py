@@ -100,18 +100,14 @@ class BeliefBase:
             else:
                 order = False 
 
-    '''def revision(self, newBelief):
+    '''
+    def revision(self, newBelief):
         formula = to_cnf(newBelief)
         negFormula = Not(formula)
         self.contraction(negFormula)
-        self.expansion(newBelief)'''
-    """        
-    ''' contraction'''
-    def contraction(self, belief):
-        newBelief = to_cnf(belief)
-        for b in self.beliefBase:
-            if b == newBelief:
-                self.beliefBase.remove(newBelief)
+        self.expansion(newBelief)
+    '''
+    """
 
     def print_belief(self):
         for b in self.beliefs:
@@ -119,15 +115,6 @@ class BeliefBase:
 
     def show_current_belief_base(self):
         print ("Current Belief Base: ", self.beliefBase)
-    
-    #Not sure we need this class. Maybe is helpful only when we do the part with plausible belief
-    """      
-    class Belief:
-        ''' it gets the formula to convert it into cnf form '''
-        def __init__(self, formula) -> None:
-            self.formula = formula
-            self.newcnf = to_cnf(formula)
-    """
 
 if __name__ == "__main__":
     x, y = symbols('x,y')
