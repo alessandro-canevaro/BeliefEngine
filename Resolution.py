@@ -4,7 +4,7 @@ import itertools
 
 def PL_Resolution(KB, alpha):
     """Algorithm to check if alpha is entailed in KB.
-       return true or false
+       returns true or false
     """
 
     # Split base into conjuncts
@@ -57,9 +57,13 @@ def PL_Resolve(Ci, Cj):
     return clauses
 
 def split(clause, op):
+    """Split the clause every time op is found and return the list of literals.
+    """
     result = []
 
     def collect(subargs):
+        """recursive sub-function.
+        """
         for arg in subargs:
             if isinstance(arg, op):
                 collect(arg.args)
