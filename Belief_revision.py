@@ -1,78 +1,60 @@
 import itertools
 
 from numpy.core.numerictypes import maximum_sctype
-from sympy.logic.boolalg import to_cnf, Or, And
-from BeliefBase import BeliefBase
+from sympy.logic.boolalg import to_cnf, Or, And, Equivalent, Not
+from BeliefBase import BeliefBase,_check_value
 from Resolution import *
 import numpy as np
 
-def Partial_meet_contraction(BB, formula):
-    old_KB = KB.beliefBase
 
 ''' contraction'''
-def Belief_Contraction(KB, belief):
+def SimpContraction(KB, belief):
     newBelief = to_cnf(belief)
     for b in KB.beliefBase:
         if b == newBelief:
             KB.beliefBase.remove(newBelief)
 
-def contract(BB, belief):
-    if PL_Resolution([], belief.formula):
-        # it is tautology -> should be ignored
-        return
+def general_Remainders(BB, belief):
+    remainders = []
+    new_belief = belief.formula.copy()
+    if belief.value is not None:
+        if not PL_Resolution(BB.formulaList, new_belief):
+            # Whole knowledge base is solution
+            return BB
+    remainders = []
+    allBeliefs = self.beliefs
 
-    oldrank = self.rank(formula)
-    delta = BeliefBase()
-    delta.beliefs = self.beliefs.copy()
-    for belief in self.beliefs:
-        if belief.rank <= oldrank:
-            bb = [to_cnf(x.formula) for x in filter(lambda x: x.rank >= (oldrank + 1), delta.beliefs)]
-            bb = reduce(lambda x, y: x & y, bb, true)
-            if not entails(bb, formula | belief.formula):
-                r = delta.rank(belief.formula)
-                delta.beliefs.remove(belief)
-                print(f">>> {belief} removed by (C-) condition")
-                if r < oldrank or not entails(bb, formula >> belief.formula):
-                    for b in self.beliefs:
-                        if formula >> belief.formula == b.formula:
-                            delta.beliefs.remove(b)
-                    t = Belief(formula >> belief.formula, r)
-                    delta.beliefs.add(t)
-                    print(f">>> Added {t} to belief basis to satisfy (K-5)")
-    self.beliefs = delta.beliefs
+    def contract(beliefList, beliefToRemove):
+        if len(beliefList) == 1:
+            if not self.resolution(beliefList, beliefToRemove):
+                remainders.append(beliefList)
+            return
 
-def contraction(self, belief, value):
-remainders = self.getRemainders(belief)
-value = float(value)
+        for i in beliefList:
+            tmp = helpFunctions.removeFromList(i, beliefList)
+            if self.resolution(tmp, beliefToRemove):
+                # Implies beliefToRemove, have to remove more
+                contract(tmp, beliefToRemove)
+            else:
+                # Does not imply beliefToRemove, one of the possible remainders
+                remainders.append(tmp)
 
-maxCertaintyGlobal = 0.0
-if self.values:
-    maxCertaintyGlobal = max(self.values.values())
+    contract(allBeliefs, beliefCnf)
 
-maxCertainty = -10 ** 10
-maxCertaintyCombined = 0.0
-bestRemainder = []
-# Find the remainder containing the highest certainty value
-# If there are more than one remainder containing the highest certainty value,
-# choose the one with the highest combined certainty
-for r in remainders:
-    tmpSum = sum(self.values[str(c)] for c in r)
-    for c in r:
-        tmpValue = self.values[str(c)]
-        if tmpValue > maxCertainty:
-            maxCertainty = tmpValue
-            maxCertaintyCombined = tmpSum
-            bestRemainder = r
-        elif tmpValue == maxCertainty:
-            if tmpSum > maxCertaintyCombined:
-                bestRemainder = r
+    # Remove duplicates and remainders that are not maximal (remainders)
+    remainders = helpFunctions.removeSublist(remainders)
 
-if maxCertainty < maxCertaintyGlobal and value < maxCertaintyGlobal:
-    # By doing the revision we would remove some belief that we are more certain of
-    # than the belief that we are trying to add, so we decide not to do it
-    return
+    return remainders
 
-self.beliefs = bestRemainder
+def contraction(BB, belief):
+    remainders = general_Remainders(BB, belief)
+    new_BB = BeliefBase()
+    bestRemainder = []
+
+    for b in bestRemainder:
+        for ob in BB:
+            if ob.beliefs.formula == b.formula:
+                new_BB.expand(b)
 
 def revision(BB, belief):
     formula = to_cnf(belief)
@@ -80,12 +62,11 @@ def revision(BB, belief):
     if PL_Resolution([], negFormula):
         print('\nInconsistent formulas cannot be added to the knowledge base')
         return
-    if formula in BB.beliefs and belief.value != 0:
-        # Revising with a formula already in the knowledge base is updating the certainty value for that formula
-        BB.beliefs.values[str(formula)] = float(belief.value)
-        return
-    contraction(negFormula, belief.value)
-    BB.add(self.beliefs, formula, float(belief.value))
+    if belief.value is not None:
+        if not _check_value(belief.value):
+            return
+    contraction(BB, negFormula)
+    BB.expand(belief)
 
 if __name__ == '__main__':
     KB = BeliefBase()

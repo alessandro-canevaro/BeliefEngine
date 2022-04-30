@@ -4,6 +4,17 @@ import itertools
 from math import isclose
 from Resolution import PL_Resolution
 
+def _check_value(value):
+    '''
+    Description:
+        Checks the value of the belief is withing range (0=<n<=1)
+    '''
+    flag = True
+    if not((0 < value) and (value <= 1)):
+        print("the value of belief should be in the range(0,1]")
+        flag = False
+    return flag
+
 class Belief:
     def __init__(self, formula, value=None) -> None:
         self.formula = to_cnf(formula)
@@ -12,27 +23,19 @@ class Belief:
 class BeliefBase:
     ''' initially belief base is empty '''
     def __init__(self):
-        self.beliefs = [] #list of Belief objects
+        self.beliefs = []#list of Belief objects
+        self.formulaList = []#List of Beliefs formula, use to PL_resolution
         self.decrease_constant = 0.1
-
-    def _check_value(self, value):
-        '''
-        Description:
-            Checks the value of the belief is withing range (0=<n<=1)
-        '''
-        flag = True
-        if not((0 < value) and (value <= 1)):
-            print("the value of belief should be in the range(0,1]")
-            flag = False
-        return flag
 
     def _removeBelief(self, formula):
         for i, b in enumerate(self.beliefs):
             if b.formula == formula:
                 self.beliefs.pop(i)
+                self.formulaList.pop(i)
 
     def expand(self, belief: Belief):
         if PL_Resolution([], ~belief.formula):
+            print("the belief is contraddiction!")
             #it is contraddiction -> should be ignored
             return
 
@@ -42,11 +45,12 @@ class BeliefBase:
                 if symbols_set.intersection(b.formula.free_symbols):
                     b.value -= b.value*self.decrease_constant
             belief.value = 1
-        elif not self._check_value(belief.value):
+        elif not _check_value(belief.value):
             return
 
         self._removeBelief(belief.formula)
         self.beliefs.append(belief)
+        self.formulaList.append(belief.formula)
 
     def clear_belief_base(self):
         self.beliefBase = [] # may be it can be dict or a set?
@@ -54,8 +58,6 @@ class BeliefBase:
 
     def getclauses(self):
         return [belief.formula for belief in self.beliefs]
-
-    
 
     """       
     def arrangeBeliefs(self):
@@ -118,17 +120,23 @@ class BeliefBase:
     def print_belief(self):
         for b in self.beliefs:
             print(b.formula, b.value)
+        print(self.formulaList)
 
     def show_current_belief_base(self):
         print ("Current Belief Base: ", self.beliefBase)
 
 if __name__ == "__main__":
-    x, y = symbols('x,y')
+    x, y, z= symbols('x,y,z')
 
     bb = BeliefBase()
     bb.expand(Belief(x))
-    bb.expand(Belief(x|y))
-    bb.expand(Belief(x & Not(x))) #contraddiction is not added
+    bb.expand(Belief(x & y))
+    bb.expand(Belief(x & z)) #contraddiction is not added
     bb.expand(Belief(x)) #only the duplicate with the highest order is kept
+    # print(type(bb.beliefs[0].formula))
+    print(PL_Resolution(bb.formulaList, y))
     bb.expand(Belief(y, 0.3)) #add belief with specific value
+    bb.print_belief()
+    bb._removeBelief(x & y)
+    bb.expand(Belief(y & z))
     bb.print_belief()
