@@ -1,4 +1,3 @@
-from pip import main
 from BeliefBase import *
 from Resolution import PL_Resolution
 
