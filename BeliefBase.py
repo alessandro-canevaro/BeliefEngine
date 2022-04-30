@@ -15,6 +15,17 @@ class BeliefBase:
         self.beliefs = [] #list of Belief objects
         self.decrease_constant = 0.1
 
+    def _check_value(self, value):
+        '''
+        Description:
+            Checks the value of the belief is withing range (0=<n<=1)
+        '''
+        flag = True
+        if not((0 < value) and (value <= 1)):
+            print("the value of belief should be in the range(0,1]")
+            flag = False
+        return flag
+
     def _removeBelief(self, formula):
         for i, b in enumerate(self.beliefs):
             if b.formula == formula:
@@ -31,6 +42,8 @@ class BeliefBase:
                 if symbols_set.intersection(b.formula.free_symbols):
                     b.value -= b.value*self.decrease_constant
             belief.value = 1
+        elif not self._check_value(belief.value):
+            return
 
         self._removeBelief(belief.formula)
         self.beliefs.append(belief)
@@ -100,13 +113,6 @@ class BeliefBase:
             else:
                 order = False 
 
-    '''
-    def revision(self, newBelief):
-        formula = to_cnf(newBelief)
-        negFormula = Not(formula)
-        self.contraction(negFormula)
-        self.expansion(newBelief)
-    '''
     """
 
     def print_belief(self):
