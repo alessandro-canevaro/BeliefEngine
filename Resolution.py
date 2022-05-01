@@ -9,7 +9,7 @@ def PL_Resolution(KB, alpha):
 
     # Split base into conjuncts
     clauses = split(KB+[to_cnf(~alpha)], And)
-
+    # clauses = KB + split(to_cnf(~alpha), And)
     # Special case if one clause is already False
     if False in clauses:
         return True
@@ -77,7 +77,9 @@ if __name__ == "__main__":
     x, y = symbols('x,y')
     print(PL_Resolve(x | (y | x >> y), Not(x >> y)))
     print(PL_Resolve(x | y, Not(x) | Not(y)))
+    print("end\n")
     #print(False in x)
-    print(PL_Resolution([x|y], x))
+    print(type([x]))
+    print(PL_Resolution([x|y, y], x))
     print(PL_Resolution([x], x|y))
     print("---------------------")
