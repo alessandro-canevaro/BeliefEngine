@@ -75,8 +75,7 @@ def contraction(BB, belief, value=None):
             if ob.formula == b:
                 new_BB.expand(ob)
 
-    new_BB.print_belief()
-
+    # new_BB.print_belief()
     return new_BB
 
 
@@ -100,12 +99,13 @@ if __name__ == '__main__':
     bb = BeliefBase()
     bb.expand(Belief(x))
     bb.expand(Belief(x & y))
-    # bb.expand(Belief(x | y & z))
+    bb.expand(Belief(x | y & z))
     bb.expand(Belief(y & z))
-    bb.expand(Belief(~z))
+    # bb.expand(Belief(~z))
     bb.print_belief()
     # bb.expand(Belief(x | z)) #contraddiction is not added
-    # contraction(bb, z)
-    bb = revision(bb, z)
+    # bb = contraction(bb, ~z)
+    bb.print_belief()
+    bb = revision(bb, ~z)
 
 
