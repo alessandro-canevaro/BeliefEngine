@@ -27,6 +27,9 @@ class BeliefBase:
         self.formulaList = formulaList  # List of Beliefs formula, use to PL_resolution
         self.decrease_constant = 0.1
 
+    def __eq__(self, BB):
+        return set(self.formulaList) == set(BB.formulaList)
+
     def _removeBelief(self, formula):
         for i, b in enumerate(self.beliefs):
             if b.formula == formula:

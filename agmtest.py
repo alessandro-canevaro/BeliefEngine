@@ -6,87 +6,85 @@ import Resolution
 
 
 def successPostulateContraction():
-    alpha = symbols('x')
-    bb = BeliefBase()
-    if Resolution.PL_Resolution([], alpha):
-        assert False
-    bb.contract(Belief(alpha))
-    assert not Resolution.PL_Resolution(bb.getclauses(), alpha)
-
-def successPostulateRevision():
-    bb = BeliefBase()
-    alpha = symbols('x')
-    bb.revise(Belief(alpha))
-    assert alpha in bb.formulaList
-
-def inclusionPostulateContraction():
-    bb = BeliefBase()
+    bb = BeliefBase([], [])
     x, y = symbols('x, y')
     bb.expand(Belief(x))
     bb.expand(Belief(y))
     bb.contract(Belief(x))
-    assert y in bb.formulaList
+    assert x not in bb.formulaList
+
+def successPostulateRevision():
+    bb = BeliefBase([], [])
+    x, y = symbols('x, y')
+    bb.expand(Belief(~x))
+    bb.expand(Belief(y))
+    bb.revise(Belief(x))
+    assert x in bb.formulaList
+
+def inclusionPostulateContraction():
+    bb = BeliefBase([], [])
+    x, y = symbols('x, y')
+    bb.expand(Belief(x))
+    bb.expand(Belief(y))
+    bb.contract(Belief(x))
+    assert set(bb.formulaList).issubset(set([x, y]))
 
 def inclusionPostulateRevision():
-    bb1 = BeliefBase()
-    bb2 = BeliefBase()
+    bb1 = BeliefBase([], [])
+    bb2 = BeliefBase([], [])
     x, y = symbols('x, y')
     bb1.expand(Belief(x))
     bb1.expand(Belief(y))
     bb2.expand(Belief(x))
     bb2.revise(Belief(y))
-    assert set(bb1.formulaList) == set(bb2.formulaList)
+    assert set(bb1.formulaList).issubset(set(bb2.formulaList))
 
 def vacuityPostulateContraction():
-    bb = BeliefBase()
+    bb = BeliefBase([], [])
     x, y = symbols('x, y')
     bb.expand(Belief(x))
     bb.contract(Belief(y))
-    assert x in bb.formulaList
+    assert set(bb.formulaList) == set([x])
 
 def vacuityPostulateRevsion():
-    bb = BeliefBase()
-    alpha = symbols('x')
-    bb2 = BeliefBase()
-
-    if Resolution.PL_Resolution(bb.getclauses(), ~alpha):
-        assert False
-
-    bb.revise(Belief(alpha))
-    bb2.expand(Belief(alpha))
-    assert bb == bb2
+    bb1 = BeliefBase([], [])
+    bb2 = BeliefBase([], [])
+    x, y = symbols('x, y')
+    bb1.expand(Belief(x))
+    bb1.expand(Belief(y))
+    bb2.expand(Belief(x))
+    bb2.revise(Belief(y))
+    assert bb1 == bb2
 
 def extensionalityPostulatecontraction():
-    x , y = symbols('x,y')
-    bb1 = BeliefBase()
-    bb2 = BeliefBase()
-    '''phi = Implies(x , y)'''
-    phi = Or(Not(y), x)
-    xi = Or(Not(x), y)
-    alpha = And(phi, xi)
-
-    if Resolution.PL_Resolution({}, alpha):
-        assert False
-
-    bb1.contract(Belief(phi))
-    bb2.contract(Belief(xi))
+    bb1 = BeliefBase([], [])
+    bb2 = BeliefBase([], [])
+    x, y = symbols('x, y')
+    bb1.expand(Belief(x))
+    bb1.expand(Belief(And(Or(Not(y), x), Or(Not(x), y))))
+    bb1.contract(Belief(x))
+    bb2.expand(Belief(x))
+    bb2.expand(Belief(And(Or(Not(y), x), Or(Not(x), y))))
+    bb2.contract(Belief(y))
     assert bb1 == bb2
 
 def extensionalityPostulateRevision():
-    x , y = symbols('x,y')
-    bb1 = BeliefBase()
-    bb2 = BeliefBase()
-    phi = Or(Not(y), x)
-    xi = Or(Not(x), y)
-    alpha = And(phi, xi)
-
-    if Resolution.PL_Resolution({}, alpha):
-        assert False
-
-    bb1.revision(Belief(phi))
-    bb2.revision(Belief(xi))
-
-    assert bb1 == bb2
+    bb1 = BeliefBase([], [])
+    bb2 = BeliefBase([], [])
+    x, y = symbols('x, y')
+    bb1.expand(Belief(x))
+    bb1.expand(Belief(And(Or(Not(y), x), Or(Not(x), y))))
+    bb1.revise(Belief(x))
+    bb2.expand(Belief(x))
+    bb2.expand(Belief(And(Or(Not(y), x), Or(Not(x), y))))
+    bb2.revise(Belief(y))
+    for b in bb1.formulaList:
+        if not Resolution.PL_Resolution(bb2.formulaList, b):
+            assert False
+    for b in bb2.formulaList:
+        if not Resolution.PL_Resolution(bb1.formulaList, b):
+            assert False
+    assert True
 
 def consistencyPostulate():
     pass
