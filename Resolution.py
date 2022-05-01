@@ -1,5 +1,5 @@
 from sympy import *
-from sympy.logic.boolalg import to_cnf, And, Or, Equivalent, Not
+from sympy.logic.boolalg import to_cnf, And, Or, Not
 import itertools
 
 def PL_Resolution(KB, alpha):

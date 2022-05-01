@@ -22,10 +22,8 @@ class Belief:
         self.formula = to_cnf(formula)
         self.value = value
 
-
 class BeliefBase:
     ''' initially belief base is empty '''
-
     def __init__(self):
         self.beliefs = []  # list of Belief objects
         self.formulaList = []  # List of Beliefs formula, use to PL_resolution
@@ -42,11 +40,6 @@ class BeliefBase:
             print("the belief is contraddiction!")
             # it is contraddiction -> should be ignored
             return
-        # if PL_Resolution(self.formulaList, ~belief.formula):
-        #     print("the belief need to revise!")
-        #     new_beliefs = revision(self, belief.formula)
-        #     self.beliefs = new_beliefs.beliefs
-        #     self.formulaList = new_beliefs.formulaList
 
         if belief.value is None:
             symbols_set = belief.formula.free_symbols
@@ -62,10 +55,13 @@ class BeliefBase:
         self.formulaList.append(belief.formula)
 
     def clear_belief_base(self):
-        self.beliefBase = []  # may be it can be dict or a set?
+        self.beliefs = [] # may be it can be dict or a set?
+
 
     def getclauses(self):
         return [belief.formula for belief in self.beliefs]
+
+    
 
     """       
     def arrangeBeliefs(self):
@@ -126,13 +122,22 @@ class BeliefBase:
     """
 
     def print_belief(self):
-        for b in self.beliefs:
-            print(b.formula, b.value)
-        print(self.formulaList)
+        if self.beliefs:
+            for b in self.beliefs:
+                print(b.formula, b.value)
+            print(self.formulaList)
 
-    def show_current_belief_base(self):
-        print("Current Belief Base: ", self.beliefBase)
-
+        else:
+            print("The belief base is empty")
+    
+    #Not sure we need this class. Maybe is helpful only when we do the part with plausible belief
+    """      
+    class Belief:
+        ''' it gets the formula to convert it into cnf form '''
+        def __init__(self, formula) -> None:
+            self.formula = formula
+            self.newcnf = to_cnf(formula)
+    """
 
 if __name__ == "__main__":
     x, y, z = symbols('x,y,z')
