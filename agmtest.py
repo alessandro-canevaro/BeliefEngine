@@ -33,7 +33,6 @@ def inclusionPostulateRevision():
     bb2.expand(Belief(alpha))
     assert bb1.beliefs.issubset(bb2.beliefs)
 
-
 def vacuityPostulateContraction():
     bb = BeliefBase()
     alpha = symbols('x')
@@ -89,3 +88,15 @@ def extensionalityPostulateRevision():
 def consistencyPostulate():
     pass
 
+
+
+if __name__ == "__main__":
+    successPostulateContraction()
+    successPostulateRevision()
+    inclusionPostulateContraction()
+    inclusionPostulateRevision()
+    vacuityPostulateContraction()
+    vacuityPostulateRevsion()
+    extensionalityPostulatecontraction()
+    extensionalityPostulateRevision()
+    consistencyPostulate()
