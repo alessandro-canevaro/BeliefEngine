@@ -1,5 +1,7 @@
 from BeliefBase import *
 from Resolution import PL_Resolution
+from sympy import *
+
 
 class UserInterface:
     def __init__(self) -> None:
@@ -25,7 +27,7 @@ class UserInterface:
 
     def selectAction(self):
         while True:
-            a = input("Choose an action:" )[0].lower()
+            a = input("Choose an action:")[0].lower()
             if a in "parcewq":
                 return a
 
@@ -41,13 +43,20 @@ class UserInterface:
         while True:
             try:
                 formula = input("Insert the formula: ")
-                self.bb.expand(Belief(formula))
+                print(formula)
+                neg_formula = '~(' + formula + ')'
+                negformula = Belief(neg_formula).formula
+                if PL_Resolution(self.bb.formulaList, negformula):
+                    print("Can not add the belief, need to revise")
+                    self.bb.revise(Belief(formula))
+                else:
+                    self.bb.expand(Belief(formula))
+                # self.bb.expand(Belief(formula))
                 print("the new belief base is:")
                 self.bb.print_belief()
                 break
             except SympifyError:
                 print("The formula is not valid")
-
 
     def reviseBelief(self):
         while True:
@@ -85,5 +94,6 @@ class UserInterface:
 def main():
     ui = UserInterface()
     ui.run()
+
 
 main()
