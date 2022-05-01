@@ -8,38 +8,41 @@ import Resolution
 def successPostulateContraction():
     alpha = symbols('x')
     bb = BeliefBase()
-    if Resolution.PL_Resolution({}, alpha):
+    if Resolution.PL_Resolution([], alpha):
         assert False
-    bb.contraction(Belief(alpha))
+    bb.contract(Belief(alpha))
     assert not Resolution.PL_Resolution(bb.getclauses(), alpha)
 
 def successPostulateRevision():
     bb = BeliefBase()
     alpha = symbols('x')
-    bb2 = bb.revision(Belief(alpha))
-    assert bb2.beliefs.issubset(bb)
+    bb.revise(Belief(alpha))
+    assert alpha in bb.formulaList
 
 def inclusionPostulateContraction():
     bb = BeliefBase()
-    alpha = symbols('x')
-    bb.contraction(Belief(alpha))
-    assert Resolution.PL_Resolution(bb.getclauses(), alpha)
+    x, y = symbols('x, y')
+    bb.expand(Belief(x))
+    bb.expand(Belief(y))
+    bb.contract(Belief(x))
+    assert y in bb.formulaList
 
 def inclusionPostulateRevision():
     bb1 = BeliefBase()
     bb2 = BeliefBase()
-    alpha = symbols('x')
-    bb1.revision(Belief(alpha))
-    bb2.expand(Belief(alpha))
-    assert bb1.beliefs.issubset(bb2.beliefs)
+    x, y = symbols('x, y')
+    bb1.expand(Belief(x))
+    bb1.expand(Belief(y))
+    bb2.expand(Belief(x))
+    bb2.revise(Belief(y))
+    assert set(bb1.formulaList) == set(bb2.formulaList)
 
 def vacuityPostulateContraction():
     bb = BeliefBase()
-    alpha = symbols('x')
-    if Resolution.PL_Resolution(bb.getclauses(), alpha):
-        assert False
-    bb2 = bb.contract(Belief(alpha))
-    assert bb == bb2
+    x, y = symbols('x, y')
+    bb.expand(Belief(x))
+    bb.contract(Belief(y))
+    assert x in bb.formulaList
 
 def vacuityPostulateRevsion():
     bb = BeliefBase()
@@ -49,7 +52,7 @@ def vacuityPostulateRevsion():
     if Resolution.PL_Resolution(bb.getclauses(), ~alpha):
         assert False
 
-    bb.revision(Belief(alpha))
+    bb.revise(Belief(alpha))
     bb2.expand(Belief(alpha))
     assert bb == bb2
 
@@ -100,3 +103,4 @@ if __name__ == "__main__":
     extensionalityPostulatecontraction()
     extensionalityPostulateRevision()
     consistencyPostulate()
+    print("all test passed")
