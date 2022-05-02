@@ -6,6 +6,7 @@ $ pip install sympy
 
 the entry point of the code is the file main.py
 
+You are given a default belief base and you have the following options:
 
 ---List of Actions---
 - Print(p): Print current belief base
