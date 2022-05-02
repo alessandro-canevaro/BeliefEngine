@@ -73,7 +73,7 @@ class UserInterface:
         while True:
             try:
                 formula = input("Insert the formula: ")
-                self.bb.contract(Belief(formula))
+                self.bb.contraction(Belief(formula))
                 print("the new belief base is:")
                 self.bb.print_belief()
                 break
