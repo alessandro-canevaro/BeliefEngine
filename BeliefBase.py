@@ -62,7 +62,7 @@ class BeliefBase:
             if b == newBelief:
                 KB.beliefBase.remove(newBelief)
 
-    def general_Remainders(self,belief):
+    def generate_Remainders(self,belief):
         new_belief = to_cnf(belief)
         remainders = []
         if not PL_Resolution(self.formulaList, new_belief):
@@ -107,7 +107,7 @@ class BeliefBase:
         return resRemainders
 
     def contraction(self, belief):
-        remainders = self.general_Remainders(belief.formula)
+        remainders = self.generate_Remainders(belief.formula)
         old_beliefs = self.beliefs
         self.clear_belief_base()
 
@@ -133,7 +133,6 @@ class BeliefBase:
                     remaindersvalues.append(sum)
 
             bestRemainder = bestRemainders[remaindersvalues.index(max(remaindersvalues))]
-
 
             for b in bestRemainder:
                 for ob in old_beliefs:
