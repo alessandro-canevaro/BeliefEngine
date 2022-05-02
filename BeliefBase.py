@@ -106,7 +106,7 @@ class BeliefBase:
 
         return resRemainders
 
-    def contract(self, belief):
+    def contraction(self, belief):
         remainders = self.general_Remainders(belief.formula)
         old_beliefs = self.beliefs
         self.clear_belief_base()
@@ -132,7 +132,7 @@ class BeliefBase:
         if belief.value is not None:
             if not _check_value(belief.value):
                 return
-        self.contract(Belief(negFormula))
+        self.contraction(Belief(negFormula))
         self.expand(belief)
         #self.print_belief()
 
@@ -158,11 +158,15 @@ if __name__ == "__main__":
     bb = BeliefBase()
     bb.expand(Belief(x))
     bb.expand(Belief(x & y))
-    bb.expand(Belief(x & z))  # contraddiction is not added
-    bb.expand(Belief(x))  # only the duplicate with the highest order is kept
+    bb.expand(Belief(x | y))  # contraddiction is not added
+    bb.expand(Belief(x >> y))  # only the duplicate with the highest order is kept
+    bb.expand(Belief(y >> x))
     # print(type(bb.beliefs[0].formula))
     print(PL_Resolution(bb.formulaList, y))
-    bb.expand(Belief(y, 0.3))  # add belief with specific value
+    # bb.expand(Belief(y, 0.3))  # add belief with specific value
+    bb.print_belief()
+    bb.contract(Belief(x))
+
     bb.print_belief()
     bb._removeBelief(x & y)
     bb.expand(Belief(y & z))
