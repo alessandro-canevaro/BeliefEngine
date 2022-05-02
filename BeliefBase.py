@@ -125,7 +125,7 @@ class BeliefBase:
             remaindersvalues = []
             for r in remainders:
                 remainderlens.append(len(r))
-            print(max(remainderlens))
+            #print(max(remainderlens))
             for i in remainderlens:
                 if i == max(remainderlens):
                     bestRemainders.append(remainders[remainderlens.index(i)])

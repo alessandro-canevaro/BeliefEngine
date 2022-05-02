@@ -1,6 +1,6 @@
 
-from sympy import  Implies, symbols 
-from sympy.logic.boolalg import to_cnf, And, Or, Equivalent, Not
+from sympy import symbols 
+from sympy.logic.boolalg import And, Or, Not
 from BeliefBase import Belief, BeliefBase
 import Resolution
 
@@ -10,7 +10,7 @@ def successPostulateContraction():
     x, y = symbols('x, y')
     bb.expand(Belief(x))
     bb.expand(Belief(y))
-    bb.contract(Belief(x))
+    bb.contraction(Belief(x))
     assert x not in bb.formulaList
 
 def successPostulateRevision():
@@ -26,7 +26,7 @@ def inclusionPostulateContraction():
     x, y = symbols('x, y')
     bb.expand(Belief(x))
     bb.expand(Belief(y))
-    bb.contract(Belief(x))
+    bb.contraction(Belief(x))
     assert set(bb.formulaList).issubset(set([x, y]))
 
 def inclusionPostulateRevision():
@@ -43,7 +43,7 @@ def vacuityPostulateContraction():
     bb = BeliefBase([], [])
     x, y = symbols('x, y')
     bb.expand(Belief(x))
-    bb.contract(Belief(y))
+    bb.contraction(Belief(y))
     assert set(bb.formulaList) == set([x])
 
 def vacuityPostulateRevsion():
@@ -62,10 +62,10 @@ def extensionalityPostulatecontraction():
     x, y = symbols('x, y')
     bb1.expand(Belief(x))
     bb1.expand(Belief(And(Or(Not(y), x), Or(Not(x), y))))
-    bb1.contract(Belief(x))
+    bb1.contraction(Belief(x))
     bb2.expand(Belief(x))
     bb2.expand(Belief(And(Or(Not(y), x), Or(Not(x), y))))
-    bb2.contract(Belief(y))
+    bb2.contraction(Belief(y))
     assert bb1 == bb2
 
 def extensionalityPostulateRevision():
