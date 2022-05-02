@@ -111,12 +111,29 @@ class BeliefBase:
         old_beliefs = self.beliefs
         self.clear_belief_base()
 
+        def valueSum(Beliefs, remainders):
+            sum_value = 0
+            for rb in remainders:
+                for be in Beliefs:
+                    if be.formula == rb:
+                        sum_value = sum_value + be.value
+
+            return sum_value
         if len(remainders) > 0:
-            bestRemainder = []
+            bestRemainders = []
             remainderlens = []
+            remaindersvalues = []
             for r in remainders:
                 remainderlens.append(len(r))
-            bestRemainder = remainders[remainderlens.index(max(remainderlens))]
+            print(max(remainderlens))
+            for i in remainderlens:
+                if i == max(remainderlens):
+                    bestRemainders.append(remainders[remainderlens.index(i)])
+                    sum = float(valueSum(old_beliefs, remainders[remainderlens.index(i)]))
+                    remaindersvalues.append(sum)
+
+            bestRemainder = bestRemainders[remaindersvalues.index(max(remaindersvalues))]
+
 
             for b in bestRemainder:
                 for ob in old_beliefs:
@@ -151,7 +168,8 @@ class BeliefBase:
 
         else:
             print("The belief base is empty")
-    
+
+
 if __name__ == "__main__":
     x, y, z = symbols('x,y,z')
 
@@ -165,9 +183,10 @@ if __name__ == "__main__":
     print(PL_Resolution(bb.formulaList, y))
     # bb.expand(Belief(y, 0.3))  # add belief with specific value
     bb.print_belief()
-    bb.contract(Belief(x))
+    bb.contraction(Belief(x))
 
     bb.print_belief()
     bb._removeBelief(x & y)
+    bb.print_belief()
     bb.expand(Belief(y & z))
     bb.print_belief()
