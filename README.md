@@ -9,18 +9,18 @@ Our Belief Engine has Class BeliefBase which is the foundation of the whole impl
 - Resolution.py - handles the logical entailments properties
 - agmtest.py - includes different AGM postulates test functions
 
-# Packages required to install prior to run the game
+# Packages required to install prior to run the agent
 - pip install sympy
 
 # Key actions to be performed:
 
-- Print(p): Print current belief base
-- Add(a): Add a new belief
-- Revise(r): Revise the current belief base with a new belief
-- Contraction(c): Contract the current belief base
-- Check(e): Check if a formula is entailed in the belief base
-- Clear(w): Clear current belief base
-- Quit(q): Terminate execution
+- Print (p): Print current belief base
+- Add (a): Add a new belief
+- Revise (r): Revise the current belief base with a new belief
+- Contraction (c): Contract the current belief base
+- Check (e): Check if a formula is entailed in the belief base
+- Clear (w): Clear current belief base
+- Quit (q): Terminate execution
 
 # Test
 Run the AGM postulates test 
